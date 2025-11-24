@@ -311,21 +311,21 @@ sns.set_style('whitegrid')
 #I then plotted the boxplots with states ordered by total cases
 
 # Detect date columns (vectorized) and pick the most recent date
-date_mask_all = pd.to_datetime(covid_df.columns, errors='coerce').notna()
-date_cols_all = covid_df.columns[date_mask_all]
-date_cols_all = sorted(date_cols_all, key=lambda c: pd.to_datetime(c))
-latest_col = date_cols_all[-1]
+date_mask = pd.to_datetime(covid_df.columns, errors='coerce').notna()
+date_cols = covid_df.columns[date_mask]
+date_cols = sorted(date_cols, key=lambda c: pd.to_datetime(c))
+latest_col = date_cols[-1]
 
 # Aggregate at the (State, County) level for the latest date
-df_by_county_all = covid_df.groupby(['Province_State', 'Admin2'])[latest_col].sum().reset_index(name='Cases')
+df_by_county = covid_df.groupby(['Province_State', 'Admin2'])[latest_col].sum().reset_index(name='Cases')
 
 # Compute state ordering by total cases (descending)
-state_order = df_by_county_all.groupby('Province_State')['Cases'].sum().sort_values(ascending=False).index.tolist()
+state_order = df_by_county.groupby('Province_State')['Cases'].sum().sort_values(ascending=False).index.tolist()
 
 # Plot boxplots: distribution of county cumulative cases per state (most recent date)
 fig, ax = plt.subplots(figsize=(14,6))
-sns.boxplot(data=df_by_county_all, x='Province_State', y='Cases', order=state_order, ax=ax, showfliers=False)
-ax.set_xlabel('State (ordered by total cases)')
+sns.boxplot(data=df_by_county, x='Province_State', y='Cases', order=state_order, ax=ax, showfliers=False)
+ax.set_xlabel('State (ordered by total cases and without outliers)')
 ax.set_ylabel(f'Cumulative confirmed cases per county (as of {latest_col})')
 ax.set_title('Distribution of county cumulative cases by State (most recent date)')
 
